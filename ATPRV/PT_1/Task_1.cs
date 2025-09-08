@@ -6,7 +6,7 @@ namespace c__project_for_studying
 {
     public class MyProgram
     {
-        const int N = 10000;
+        //const int N = 10000;
 
         //Значение N, чтобы объем используемых данных был сопостовим с размерами кэшей L2 и L3 моего процессора
         //L2 и L3 = 4мб и 32мб
@@ -98,4 +98,5 @@ namespace c__project_for_studying
         }
     }
 }
+
 
