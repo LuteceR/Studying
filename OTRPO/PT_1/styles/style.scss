@@ -1,0 +1,70 @@
+//palette
+$main-color1: #54a8fc;
+$main-color2: #8cc3fc;
+$main-color3: #2c445c;
+$main-color4: #5c708e;
+$main-color5: #d8d2bb;
+$main-color6: #2c3c54;
+
+//vars
+$font: "Montserrat";
+$width: 1000px;
+
+header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 3.3rem;
+    background-color: $main-color4;
+
+    .logo {
+        display: flex;
+
+        img {
+            max-height: 50px;
+            max-width: 40px;
+        }
+    }
+
+    .web-name {
+        margin-left: 2rem;
+        font-size: 2.5rem;
+        font-weight: 500;
+        color: $main-color6;
+        font-family: $font;
+    }
+}
+
+.container {
+    display: flex;
+    justify-self: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: $width;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem;
+    padding: 1rem;
+    width: calc($width/4);
+    color: $main-color3;
+    background-color: $main-color2;
+
+    span.name {
+        margin:0.8rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        font-size: 1.3rem;
+        font-family: $font;
+        font-weight: 500;
+    }
+
+    span.desc {
+        display:flex;
+        font-size: 1rem;
+        font-family: $font;
+    }
+}
