@@ -113,13 +113,6 @@ namespace csProjectForStudying
                         int[,] B = new int[n, n];
                         int[,] C = new int[n, n];
 
-                        // ограничитель по времени
-                        TimeSpan limit = TimeSpan.FromSeconds(10);
-
-                        CancellationTokenSource cts = new CancellationTokenSource();
-                        cts.CancelAfter(limit);
-                        CancellationToken token = cts.Token;
-
                         Stopwatch time_n_ = new Stopwatch(); // подсчёт времени работы потоков n
                         double speedup_; // ускорение
 
