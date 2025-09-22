@@ -103,7 +103,7 @@ namespace csProjectForStudying
 
             Random rnd = new Random();
 
-            foreach (bool horizontal in new[] { true })
+            foreach (bool horizontal in new[] { true, false })
             {
                 foreach (int n in N)
                 {
