@@ -117,7 +117,6 @@ namespace csProjectForStudying
                         S2 = Parallelization(A, B, num, n * 2);
                         //Console.WriteLine($"|S2 - S1| = {Math.Abs(S1 - S2)} S1 = {S1} S2 = {S2} threads = {num} n = {n}");
                         lastNum = n;
-                        n = n * 2;
                     }
                     sw.Stop();
                     Console.WriteLine($"получившаяся точность удовлетворяющая |S2 - S1| >= e\n|S2 - S1| = |{S2} - {S1}| = {Math.Abs(S2 - S1)} n = {lastNum} threads = {num} e = {e}\n time = {sw.Elapsed.TotalSeconds}");
