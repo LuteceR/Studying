@@ -9,7 +9,7 @@ namespace csProjectForStudying
         public static double function(double x)
         {
             // моя функция
-            return ((Math.Sin(2 * x) + 9) + Math.Cos(x) / (1.3 + x * 3));
+            return ((Math.Sin(x + 2)) / (1 + x));
         }
 
         // функция, высчитывающая интеграл с l-того бина до k-того не включительно
@@ -92,12 +92,7 @@ namespace csProjectForStudying
             double B = 100.0;
             double[] Ss = new double[n];
             int lastNum = 0;
-            int[] threads = new int[5] { 4, 8 , 12, 16, 20};
-
-            Stopwatch sw = new Stopwatch();
-
-            Random rnd = new Random();
-
+            
             //Integral(A, B, 6, 1, 7);
 
             double S1 = Integral(A, B, 1, 1, 1 + 1);
@@ -106,25 +101,24 @@ namespace csProjectForStudying
             //Console.WriteLine($"{Parallelization(A, B, 4, 10000)}");
 
             // множество эпсилонов
-            double[] E = new double[2] { 0.001, 0.0001 }; 
+            double[] E = new double[5] { 0.001, 0.0001, 0.00001, 0.000001, 0.0000001 };
+            int[] threads = new int[7] { 1, 2, 4, 8, 12, 16, 20 };
 
-            foreach (int num in threads)
+            double e = E[0];
+            int num = threads[6];
+            Stopwatch sw = new Stopwatch();
+
+            sw.Start();
+            while (Math.Abs(S2 - S1) >= e)
             {
-                foreach (double e in E)
-                {
-                    sw.Start();
-                    while (Math.Abs(S2 - S1) >= e)
-                    {
-                        S1 = S2;
-                        S2 = Parallelization(A, B, num, n * 2);
-                        //Console.WriteLine($"|S2 - S1| = {Math.Abs(S1 - S2)} S1 = {S1} S2 = {S2} threads = {num} n = {n}");
-                        lastNum = n;
-                        n = n * 2;
-                    }
-                    sw.Stop();
-                    Console.WriteLine($"получившаяся точность удовлетворяющая |S2 - S1| >= e\n|S2 - S1| = |{S2} - {S1}| = {Math.Abs(S2 - S1)} n = {lastNum} threads = {num} e = {e}\n time = {sw.Elapsed.TotalSeconds}");
-                }
+                S1 = S2;
+                S2 = Parallelization(A, B, num, n * 2);
+                //Console.WriteLine($"|S2 - S1| = {Math.Abs(S1 - S2)} S1 = {S1} S2 = {S2} threads = {num} n = {n}");
+                lastNum = n;
+                n = n * 2;
             }
+            sw.Stop();
+            Console.WriteLine($"получившаяся точность удовлетворяющая |S2 - S1| >= e\n|S2 - S1| = |{S2} - {S1}| = {Math.Abs(S2 - S1)} n = {lastNum} threads = {num} e = {e}\n time = {sw.Elapsed.TotalSeconds}");
         }
     }
 }
