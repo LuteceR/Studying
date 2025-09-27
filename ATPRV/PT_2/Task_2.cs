@@ -86,13 +86,10 @@ namespace csProjectForStudying
 
         public static void Main()
         {
-            // n - количество разбиений
-            int n = 4;
             double A = 0.0;
             double B = 100.0;
-            double[] Ss = new double[n];
             int lastNum = 0;
-            
+
             //Integral(A, B, 6, 1, 7);
 
             double S1 = Integral(A, B, 1, 1, 1 + 1);
@@ -104,8 +101,11 @@ namespace csProjectForStudying
             double[] E = new double[5] { 0.001, 0.0001, 0.00001, 0.000001, 0.0000001 };
             int[] threads = new int[7] { 1, 2, 4, 8, 12, 16, 20 };
 
+            int num = threads[0];
+            int n = num;
+
             double e = E[0];
-            int num = threads[6];
+
             Stopwatch sw = new Stopwatch();
 
             sw.Start();
