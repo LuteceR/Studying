@@ -2,203 +2,123 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 
-namespace c__project_for_studying
+namespace csProjectForStudying
 {
     public class MyProgram
     {
-        // формирование массива B из масива array из элементов по индексам i до j не включительно
-        public static void calculation(double[] arr1, double[] arr2, int i, int j)
+        public static double function(double x)
         {
-            for (int k = i; k < j; k++)
-            {
-                for (int l = 0; l < k; l++) 
-                {
-                    arr2[k] = Math.Pow(arr1[k], 1.789);
-                }
-            }
+            // моя функция
+            return ((Math.Sin(2 * x) + 9) / (1.3 + x * 3));
         }
 
-        // Создание массива для параллельного последовательного вычисления из k-того кол-ва потоков
-        public static void parallelComputing(double[] a, double[] b, int n, int k)
+        // функция, высчитывающая интеграл с l-того бина до k-того не включительно
+        // от a до b с n кол-вом разбиений
+        // l > 0
+        public static double Integral(double a, double b, int n, int l, int k)
         {
-            Thread[] threads = new Thread[k];
+            // ширина бинов при разбиении длинны интеграла на n частей
+            double w = (b - a) / n;
+            double[] S = new double[k];
+            double sum = 0;
 
-            // создание первого потока вне цикла, так как он начинается не с (i * n / k + 1), а с (i * n / k)
-            // i - номер создаваемого потока + кол-во потоков до него
-            // n - размер массивов A и B
-            // k - кол-во потоков
-
-            threads[0] = new Thread(() => calculation(a, b, 0, n / k));
-            threads[0].Start();
-            //Console.WriteLine("Создан 1 поток");
-            //Console.WriteLine($"Работает с данными с индексами с 0 до {n / k}");
-
-            if (k > 1)
+            for (int i = l; i < k; i++)
             {
-                Parallel.For(1, k - 1, i => 
+                int index = i;
+                double x = a + index * w;
+                double y = function(x);
+                S[index - l] = Math.Abs(y * w);
+                //Console.WriteLine($"w = {w} x = {x} y = {y} | {S[index - l]}");
+            }
+
+            for (int i = 0; i < k - l; i++)
+            {
+                //Console.WriteLine($"S{i} = {S[i]}");
+                sum += S[i];
+            }
+
+            //Console.WriteLine($"S = {sum} | bins = {n} | from {l} to {k - 1}");
+            return sum;
+        }
+
+        // функция, которая распараллеливает задание по нахождению значения интеграла
+        // A - начало интеграла
+        // B - конец интеграла
+        // num_of_threads - количество потоков
+        // n - количество разбиений
+        public static double Parallelization(double A, double B, int num_of_threads, int n)
+        {
+            Thread[] threads = new Thread[num_of_threads];
+            int k = n / num_of_threads;
+            double[] result = new double[num_of_threads + 1];
+            double sum = 0;
+
+            for (int i = 0; i < num_of_threads; i++)
+            {
+                // index необходим, чтобы i не замыкалась
+                // + лямбда не считывает значение i на момент создания,
+                // а захватывает саму переменную и потоки работают с значением i из последней итерации
+                int index = i;
+                int start = i * k;
+                int end = (i + 1) * k;
+                threads[index] = new Thread(() =>
                 {
-                    int start = i * n / k;
-                    int end = i * (n / k) + (n / k);
-                    threads[i] = new Thread(() => calculation(a, b, start, end));
-                    threads[i].Start();
-                    //Console.WriteLine($"Создан {i + 1} поток");
-                    //Console.WriteLine($"Работает с данными с индексами с {start} до {end}");
+                    result[index] = Integral(A, B, n, start, end + 1);
                 });
 
-                // Если не получается ровно разделить массивы на все потоки, то остаток выполняет последний поток
-                threads[k - 1] = new Thread(() => calculation(a, b, n - n / k - n % k, n));
-                threads[k - 1].Start();
-                //Console.WriteLine($"Создан {k} поток");
-                //Console.WriteLine($"Работает с данными с индексами с {n - n / k - n % k} до {n}");
-            };
-
-            // дожидание завершения работы потоков
-            foreach (var thread in threads)
-            {
-                thread.Join();
-            };
-
-            //Console.WriteLine("Все потоки завершили работу!");
-        }
-
-        // Функция для подсчёта всех элементов массива arr2 из массива arr1 с элемента с индексом i и с шагом l
-        // предусмотрен отдельный случай для s = 0, тк в ином случае первый элемент не обрабатывался
-        public static void partionCalculation(double[] arr1, double[] arr2, int s, int l, int n)
-        {
-            if (s == 0)
-            {
-                arr2[0] = Math.Pow(arr1[0], 1.789);
-                partionCalculation(arr1, arr2, l, l, n);
-            }
-            else
-            {
-                for (int i = s; i < n; i = i + l)
-                {
-                    for (int k = 0; k < i; k++)
-                    {
-                        arr2[i] = Math.Pow(arr1[i], 1.789);
-                    }
-                    ;
-                }
-                ;
-            }
-            ;
-        }
-
-        // Функция создаёт k-тое кол-во потоков и каждый из них считает первый элемент, индекс которого соответствует номеру потока
-        // и каждый i-ый + 1 элемент
-        // Пришлось вынести нулевой Thread, потому что в ином случае получалось так, что какие-то потоки не работали
-        public static void CrossingParallelComputing(double[] a, double[] b, int k, int n)
-        {
-            Thread[] threads = new Thread[k];
-            threads[0] = new Thread(() => partionCalculation(a, b, 0, k, n));
-            threads[0].Start();
-
-            for (int i = 1; i < k; i++)
-            {
-                threads[i] = new Thread(() => partionCalculation(a, b, i, k, n));
+                //Console.WriteLine($"thread {i + 1} works with {start} - {end} bins");
                 threads[i].Start();
-            };
+            }
 
-            for (int i = 0; i < k; i++)
+            for (int i = 0; i < num_of_threads; i++)
             {
                 threads[i].Join();
-            };
-        }
+            }
 
-        // Использование метода Parallel.For() из namespace System.Threading.Tasks
-        // Он запускает цикл For итерациями, которые идут параллельно и на практике оказался быстрее метода parallelComputing()
-        public static void ParallelClassComputing(double[] a, double[] b, int n, int k)
-        {
-            Parallel.For(0, k, i => {
-                calculation(a, b, 0, n);
-            });
+            for (int i = 0; i < num_of_threads; i++)
+            {
+                sum += result[i];
+                //Console.WriteLine($"{result[i]}");
+            }
+
+            return sum;
         }
 
         public static void Main()
         {
-            int[] N = new int[5] { 1000, 5000, 10000, 15000, 20000 };
-            int[] numOfThreads = new int[7] { 1, 2, 4, 8, 12, 16, 20 };
-            int countOfLaunching = 20;
+            // n - количество разбиений
+            // e - эпсилон
+            int n = 4;
+            double e = 0.001;
+            double A = 0.0;
+            double B = 100.0;
+            double[] Ss = new double[n];
+            int lastNum = 0;
+            int[] threads = new int[5] { 4, 8 , 12, 16, 20};
 
-            //// код для запуска другой версии заполнения массива B
-            //foreach (int n in N)
-            //{
-            //    double[] A = new double[n];
-            //    double[] B = new double[n];
-            //    double[] results = new double[countOfLaunching];
+            Stopwatch sw = new Stopwatch();
 
-            //    Random rnd = new Random();
-            //    var stopwatch = new Stopwatch();
+            Random rnd = new Random();
 
-            //    // заполнение массива
-            //    for (int i = 0; i < n; i++)
-            //    {
-            //        A[i] = rnd.Next(0, 100);
-            //    }
+            //Integral(A, B, 6, 1, 7);
 
-            //    foreach (int num in numOfThreads)
-            //    {
-            //        for (int i = 0; i < countOfLaunching; i++)
-            //        {
-            //            stopwatch.Start();
-            //            CrossingParallelComputing(A, B, num, n);
-            //            stopwatch.Stop();
+            double S1 = Integral(A, B, 1, 1, 1 + 1);
+            double S2 = Integral(A, B, 2, 1, 2 + 1);
 
-            //            results[i] = stopwatch.Elapsed.TotalSeconds;
-            //        }
-            //        Console.WriteLine($"N = {n}, Threads = {num}, avg = {results.Average()}");
-            //    }
+            //Console.WriteLine($"{Parallelization(A, B, 4, 10000)}");
 
-            //    // вывод значений массивов A и B
-            //    for (int i = 0; i < 30; i++)
-            //    {
-            //        Console.WriteLine($"{A[i]}, {B[i]}, {i}");
-            //    }
-            //}
-
-            foreach (int n in N)
+            while (Math.Abs(S2 - S1) >= e)
             {
-                foreach (int num in numOfThreads)
+                foreach (int num in threads)
                 {
-                    double[] A = new double[n];
-                    double[] B = new double[n];
-                    double[] results = new double[countOfLaunching];
-
-                    Random rnd = new Random();
-                    var stopwatch = new Stopwatch();
-
-                    // заполнение массива
-                    for (int i = 0; i < n; i++)
-                    {
-                        A[i] = rnd.Next(0, 100);
-                    }
-                    ;
-
-                    // создание потоков и их запуск
-                    for (int i = 0; i < countOfLaunching; i++)
-                    {
-                        stopwatch.Start();
-                        parallelComputing(A, B, n, num);
-                        stopwatch.Stop();
-
-                        results[i] = stopwatch.Elapsed.TotalSeconds;
-                    }
-                    ;
-
-                    // проверка на обработку каждого элемента массива
-                    //for (int i = 0; i < B.Length; i++)
-                    //{
-                    //    Console.WriteLine($"{B[i]}, {A[i]}, {i}");
-                    //}
-
-                    //Console.WriteLine($"Для параллельного вычисления массива A из {n} элементов на {num} потоках после {countOfLaunching} запусков среднее время равно");
-                    //Console.WriteLine($"{results.Average()} сек.");
-                    Console.WriteLine($"N = {n}, Threads = {num}, avg = {results.Average()}");
+                    S1 = S2;
+                    S2 = Parallelization(A, B, num, n * 2);
+                    Console.WriteLine($"|S2 - S1| = {Math.Abs(S1 - S2)} S1 = {S1} S2 = {S2} threads = {num} n = {n}");
+                    lastNum = n;
+                    n = n * 2;
                 }
-                ;
             }
-            ;
+            Console.WriteLine($"получившаяся точность удовлетворяющая |S2 - S1| >= e\n|S2 - S1| = |{S2} - {S1}| = {Math.Abs(S2 - S1)} n = {lastNum}");
         }
     }
 }
