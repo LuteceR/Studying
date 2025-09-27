@@ -98,7 +98,7 @@ namespace csProjectForStudying
             //Console.WriteLine($"{Parallelization(A, B, 4, 10000)}");
 
             // множество эпсилонов
-            double[] E = new double[5] { 0.001, 0.0001, 0.00001, 0.000001, 0.0000001 };
+            double[] E = new double[4] { 0.001, 0.0001, 0.00001, 0.000001};
             int[] threads = new int[7] { 1, 2, 4, 8, 12, 16, 20 };
 
             int num = threads[0];
