@@ -70,10 +70,10 @@ namespace csProjectForStudying
                 threads[i].Start();
             }
 
-            for (int i = 0; i < num_of_threads; i++)
+            Parallel.For(0, num_of_threads, i =>
             {
                 threads[i].Join();
-            }
+            });
 
             for (int i = 0; i < num_of_threads; i++)
             {
